@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
+            $table->string('status')->default('O');
             $table->string('title');
             $table->text('description');
-            $table->string('priority')->default('Medium');
+            $table->string('priority')->default('M');
+            $table->unsignedBigInteger('assignee')->nullable();
             $table->string('stakeholders')->nullable();
             $table->string('tshirt_size')->nullable();
             $table->json('assets')->nullable();

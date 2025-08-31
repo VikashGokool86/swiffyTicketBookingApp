@@ -15,13 +15,17 @@ class TicketController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
+            'status' => 'required|string|max:255',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'priority' => 'required|string',
-            'stakeholders' => 'nullable|string',
+            'stakeholders.*' => 'integer|exists:users,id',
+            'assignee' => 'nullable|integer|exists:users,id',
             'tshirt_size' => 'nullable|string',
             'assets.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx'
         ]);
+
+        $data['stakeholders'] = json_encode($data['stakeholders'] ?? []);
 
         $assets = [];
         if ($request->hasFile('assets')) {
