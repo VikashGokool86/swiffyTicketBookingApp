@@ -30,14 +30,14 @@
                     @csrf
                     <div class="mb-3">
                         <label class="block text-lg font-semibold mb-1">Title</label>
-                        <input type="text" name="title" class="w-full border rounded px-3 py-2" value="{{ old('title') }}" required>
+                        <input type="text" name="title" class="w-full border rounded px-3 py-2" required>
                         @error('title')
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="mb-3">
                         <label class="block text-lg font-semibold mb-1">Description</label>
-                        <textarea name="description" rows="6" class="w-full border rounded px-3 py-2" value="{{ old('description') }}" required></textarea>
+                        <textarea name="description" rows="6" class="w-full border rounded px-3 py-2" required></textarea>
                         @error('description')
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
@@ -56,11 +56,11 @@
                         <div id="assets-preview" class="mt-2 flex flex-wrap gap-2"></div>
                     </div>
                     <!-- Hidden fields for side panel values -->
-                    <input type="hidden" name="status" id="status-hidden" value="{{ old('status') }}">
-                    <input type="hidden" name="priority" id="priority-hidden" value="{{ old('priority') }}">
-                    <input type="hidden" name="tshirt_size" id="tshirt-size-hidden" value="{{ old('tshirt_size') }}">
-                    <input type="hidden" name="assignee" id="assignee-hidden" value="{{ old('assignee') }}">
-                    <input type="hidden" name="stakeholders" id="stakeholders-hidden" value="{{ old('stakeholders') }}">
+                    <input type="hidden" name="status" id="status-hidden">
+                    <input type="hidden" name="priority" id="priority-hidden">
+                    <input type="hidden" name="tshirt_size" id="tshirt-size-hidden">
+                    <input type="hidden" name="assignee" id="assignee-hidden">
+                    <input type="hidden" name="stakeholders" id="stakeholders-hidden">
                     <div id="stakeholders-hidden-container"></div>
                     <div class="mt-6">
                         <button type="submit"
@@ -215,11 +215,6 @@
         statusSelect.addEventListener('change', function() {
             statusHidden.value = this.value;
         });
-
-        const oldStatus = statusHidden.value;
-        if (oldStatus) {
-            statusSelect.value = oldStatus;
-        }
 
         prioritySelect.addEventListener('change', function() {
             priorityHidden.value = this.value;

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 
 class TicketController extends Controller
@@ -35,8 +36,19 @@ class TicketController extends Controller
         }
         $data['assets'] = json_encode($assets);
 
-        \App\Models\Ticket::create($data);
+        $ticket = Ticket::create($data);
 
-        return redirect()->back()->with('success', 'Ticket created!');
+        if(!$ticket){
+            return redirect()->back()->with('error', 'Failed to create ticket. Please try again.');
+        }
+
+        return redirect()->route('tickets.show', $ticket->id)
+                 ->with('success', 'Ticket created!');
+
+    }
+
+    public function show(Ticket $ticket)
+    {
+        return view('tickets.show', compact('ticket'));
     }
 }
