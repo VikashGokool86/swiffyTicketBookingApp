@@ -20,4 +20,7 @@ Route::middleware([
     Route::get('/support-tickets/create', [TicketController::class, 'create'])->name('support-tickets.create');
 
     Route::resource('tickets', TicketController::class);
+
+    Route::get('tickets', [TicketController::class, 'search'])->name('tickets.search');
+    
 });

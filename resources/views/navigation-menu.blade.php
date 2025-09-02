@@ -18,6 +18,9 @@
                     <x-nav-link href="{{ route('support-tickets.create') }}" :active="request()->routeIs('support-tickets.create')">
                         {{ __('Create Support Ticket') }}
                     </x-nav-link>
+                        <x-nav-link href="{{ route('tickets.search') }}" :active="request()->routeIs('tickets.search')">
+                            {{ __('Search Tickets') }}
+                        </x-nav-link>
                 </div>
             </div>
 
@@ -147,6 +150,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('support-tickets.create') }}" :active="request()->routeIs('support-tickets.create')">
                 {{ __('Create Support Ticket') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('tickets.search') }}" :active="request()->routeIs('tickets.search')">
+                {{ __('Search Tickets') }}
             </x-responsive-nav-link>
         </div>
 

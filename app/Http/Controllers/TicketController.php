@@ -38,17 +38,37 @@ class TicketController extends Controller
 
         $ticket = Ticket::create($data);
 
-        if(!$ticket){
+        if (!$ticket) {
             return redirect()->back()->with('error', 'Failed to create ticket. Please try again.');
         }
 
         return redirect()->route('tickets.show', $ticket->id)
-                 ->with('success', 'Ticket created!');
-
+            ->with('success', 'Ticket created!');
     }
 
     public function show(Ticket $ticket)
     {
         return view('tickets.show', compact('ticket'));
+    }
+
+    public function search(Request $request)
+    {
+        $query = Ticket::query();
+
+        if ($request->filled('ticket_number')) {
+            $query->where('id', $request->ticket_number);
+        }
+
+        if ($request->filled('assignee')) {
+            $query->where('assignee', $request->assignee);
+        }
+
+        if ($request->filled('stakeholder')) {
+            $query->whereJsonContains('stakeholders', $request->stakeholder);
+        }
+
+        $tickets = $query->latest()->paginate(10)->withQueryString();
+
+        return view('tickets.search', compact('tickets'));
     }
 }

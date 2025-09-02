@@ -166,4 +166,139 @@
             </div>
         </aside>
     </div>
+     <script>
+        // Sync side panel values to hidden fields before submit
+        document.querySelector('form').addEventListener('submit', function(e) {
+            // Sync scalar values
+            document.getElementById('status-hidden').value = statusHidden.value;
+            document.getElementById('priority-hidden').value = priorityHidden.value;
+            document.getElementById('tshirt-size-hidden').value = tshirtSizeSelect.value;
+            document.getElementById('assignee-hidden').value = assigneeSelect.value;
+
+            // Clear previous stakeholder inputs
+            const container = document.getElementById('stakeholders-hidden-container');
+            container.innerHTML = '';
+
+            // Sync stakeholder array
+            const stakeholderIds = Array.from(document.querySelectorAll('#selected-stakeholders input[name="stakeholders[]"]'))
+                .map(input => input.value);
+
+            stakeholderIds.forEach(id => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'stakeholders[]';
+                input.value = id;
+                container.appendChild(input);
+            });
+        });
+
+        const select = document.getElementById('stakeholder-select');
+        const container = document.getElementById('selected-stakeholders');
+        const hiddenContainer = document.getElementById('stakeholders-hidden-container');
+        const added = new Set();
+
+        select.addEventListener('change', function() {
+            const userId = this.value;
+            const userName = this.options[this.selectedIndex].text;
+
+            if (!userId || added.has(userId)) return;
+
+            added.add(userId);
+
+            // Visible UI element
+            const displayWrapper = document.createElement('div');
+            displayWrapper.className = "flex items-center justify-between bg-gray-100 px-2 py-1 rounded";
+
+            displayWrapper.innerHTML = `
+                <span>${userName}</span>
+                <button type="button" class="text-red-500 hover:text-red-700 remove-btn">Remove</button>
+            `;
+
+            container.appendChild(displayWrapper);
+
+            // Hidden input for form submission
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'stakeholders[]';
+            hiddenInput.value = userId;
+
+            hiddenContainer.appendChild(hiddenInput);
+
+            // Remove logic
+            displayWrapper.querySelector('.remove-btn').addEventListener('click', () => {
+                added.delete(userId);
+                displayWrapper.remove();
+                hiddenInput.remove();
+            });
+
+            this.value = ""; // Reset dropdown
+        });
+
+        // Live syncing for priority and tshirt_size dropdowns
+        const statusSelect = document.getElementById('status-select');
+        const prioritySelect = document.getElementById('priority-select');
+        const assigneeSelect = document.getElementById('assignee-select');
+        const tshirtSizeSelect = document.getElementById('tshirt-size-select');
+
+        const statusHidden = document.getElementById('status-hidden');
+        const priorityHidden = document.getElementById('priority-hidden');
+        const assigneeHidden = document.getElementById('assignee-hidden');
+        const tshirtSizeHidden = document.getElementById('tshirt-size-hidden');
+
+        statusSelect.addEventListener('change', function() {
+            statusHidden.value = this.value;
+        });
+
+        prioritySelect.addEventListener('change', function() {
+            priorityHidden.value = this.value;
+        });
+
+        assigneeSelect.addEventListener('change', function() {
+            assigneeHidden.value = this.value;
+        });
+
+        tshirtSizeSelect.addEventListener('change', function() {
+            tshirtSizeHidden.value = this.value;
+        });
+
+        function handleFilePreview(input) {
+            const preview = document.getElementById('assets-preview');
+            preview.innerHTML = '';
+            const files = Array.from(input.files).slice(0, 5); // Limit to 5 files
+
+            if (input.files.length > 5) {
+                alert('You can only upload up to 5 files.');
+                input.value = '';
+                return;
+            }
+
+            files.forEach(file => {
+                const fileType = file.type;
+                const fileDiv = document.createElement('div');
+                fileDiv.className = "border rounded p-2 bg-gray-100";
+
+                // Image preview
+                if (fileType.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.className = "h-16 w-16 object-contain";
+                    img.src = URL.createObjectURL(file);
+                    img.onload = () => URL.revokeObjectURL(img.src);
+                    fileDiv.appendChild(img);
+                } else {
+                    // File icon and name for non-images
+                    const icon = document.createElement('span');
+                    icon.className = "inline-block mr-2";
+                    icon.textContent = "📄";
+                    fileDiv.appendChild(icon);
+
+                    const name = document.createElement('span');
+                    name.textContent = file.name;
+                    fileDiv.appendChild(name);
+                }
+
+                preview.appendChild(fileDiv);
+            });
+        }
+    </script>
+
 </x-app-layout>
