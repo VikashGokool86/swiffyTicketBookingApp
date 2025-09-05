@@ -9,8 +9,9 @@ class TicketController extends Controller
 {
     public function create()
     {
-        // Return the correct view for creating a support ticket
-        return view('create-support-ticket');
+        $assetsArray = []; // or pull from model if editing
+        return view('create-support-ticket', compact('assetsArray'));
+        
     }
 
     public function store(Request $request)
