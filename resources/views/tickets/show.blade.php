@@ -26,7 +26,7 @@
         <!-- Main Form -->
         <main class="flex-1 flex px-10 py-8">
             <div class="w-full max-w-3xl p-6 bg-white rounded-lg shadow" style="margin-left:10px;">
-                <form action="{{ route('tickets.update', $ticket->id) }}" method="POST" enctype="multipart/form-data" onsubmit="syncSidePanelFields()">
+                <form action="{{ route('tickets.update', $ticket->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -48,26 +48,40 @@
                         <div class="text-red-600 text-sm mt-1">{{ $message }}</div>
                         @enderror
                     </div>
-
+<script>
+    window.existingAssets = @json(json_decode($ticket->assets, true));
+</script>
                     <!-- Assets -->
-                    <div class="mb-3">
-                        <label class="block text-lg font-semibold mb-1">Upload New Assets</label>
-                        <input type="file" name="assets[]" multiple
-                            accept=".pdf,.doc,.docx,image/jpeg,image/png,image/svg+xml"
-                            class="w-full border rounded px-3 py-2" id="assets-input" onchange="handleFilePreview(this)">
-                        <small class="text-gray-500">Max 5 files. Allowed: PDF, Word, JPG, PNG, SVG</small>
-                        <div id="assets-preview" class="mt-2 flex flex-wrap gap-2">
-                            @foreach(json_decode($ticket->assets, true) ?? [] as $asset)
-                            <div class="border rounded p-2 bg-gray-100">
-                                @if(Str::endsWith($asset, ['.jpg', '.jpeg', '.png']))
-                                <img src="{{ asset('storage/' . $asset) }}" class="h-16 w-16 object-contain" alt="Asset">
-                                @else
-                                <span class="text-sm">📄 {{ basename($asset) }}</span>
-                                @endif
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
+                   <div x-data="assetManager()" x-init="initExistingAssets(window.existingAssets)" class="space-y-4">
+    <label class="block text-sm font-medium text-gray-700 mb-1">Upload Assets</label>
+    <input type="file" id="assets" name="assets[]" multiple
+        accept=".jpg,.jpeg,.png,.pdf,.docx"
+        @change="handleNewFiles($event)"
+        class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-blue-500">
+    <p class="text-xs text-gray-500 mt-1">Max 5 files. Allowed: PDF, Word, JPG, PNG</p>
+
+    <div class="mt-2 flex flex-wrap gap-2">
+        <template x-for="(item, index) in allAssets" :key="item.key">
+            <div class="relative border rounded p-2 bg-gray-100 inline-block">
+                <button type="button"
+                    class="absolute top-0 right-0 bg-white text-xs px-1 py-0.5 rounded-full shadow hover:bg-red-100"
+                    @click="item.type === 'existing' ? removeExistingAsset(index) : removeNewFile(index)">
+                    ❌
+                </button>
+
+                <template x-if="item.preview">
+                    <img :src="item.preview" class="h-16 w-16 object-contain" alt="">
+                </template>
+
+                <template x-if="!item.preview">
+                    <span class="text-sm">📄 <span x-text="item.name"></span></span>
+                </template>
+            </div>
+        </template>
+    </div>
+
+    <input type="hidden" name="existing_assets" :value="existingAssets.join(',')">
+</div>
 
                     <!-- Hidden fields synced from side panel -->
                     <input type="hidden" name="status" id="status-hidden" value="{{ old('status', $ticket->status) }}">
@@ -137,26 +151,6 @@
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium mb-1">Stakeholders</label>
-                <select id="stakeholder-select" class="w-full border rounded px-2 py-1">
-                    <option value="">-- Select a stakeholder --</option>
-                    @foreach(\App\Models\User::all() as $user)
-                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                    @endforeach
-                </select>
-
-                <div id="selected-stakeholders" class="mt-3 space-y-1">
-                    @foreach(json_decode($ticket->stakeholders, true) ?? [] as $id)
-                    <div class="flex items-center justify-between bg-gray-100 px-2 py-1 rounded">
-                        <span>{{ \App\Models\User::find($id)->name ?? 'Unknown' }}</span>
-                        <input type="hidden" name="stakeholders[]" value="{{ $id }}">
-                        <button type="button" class="text-red-500 hover:text-red-700 remove-btn">Remove</button>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="mb-4">
                 <label class="block text-sm font-medium mb-1">T-Shirt Size</label>
                 <select id="tshirt-size-select" class="w-full border rounded px-2 py-1">
                     <option value="">-- Select a tshirt size --</option>
@@ -168,9 +162,41 @@
                     <option value="XXL" {{ $ticket->tshirt_size === 'XXL' ? 'selected' : '' }}>XXL</option>
                 </select>
             </div>
+
+            <div class="mb-4">
+                <div class="mt-4 w-full" x-data="stakeholderManager(@json($preselectedStakeholders))">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Stakeholders</label>
+
+                    <select @change="addStakeholder($event)" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- Select a stakeholder --</option>
+                        @foreach(\App\Models\User::all() as $user)
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                        @endforeach
+                    </select>
+
+                    <div class="mt-3 space-y-2 w-full">
+                        <template x-for="(user, index) in stakeholders" :key="user.id">
+                            <div class="flex items-center justify-between bg-gray-100 px-3 py-2 rounded w-full">
+                                <span x-text="user.name" class="truncate"></span>
+                                <button type="button"
+                                    class="text-red-500 hover:text-red-700 text-sm"
+                                    @click="removeStakeholder(index)">
+                                    Remove
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+
+                    <template x-for="user in stakeholders" :key="'hidden-' + user.id">
+                        <input type="hidden" name="stakeholders[]" :value="user.id">
+                    </template>
+                </div>
+            </div>
+
+
         </aside>
     </div>
-    <script>
+    <!-- <script>
         // Sync side panel values to hidden fields before submit
         document.querySelector('form').addEventListener('submit', function(e) {
             // Sync scalar values
@@ -195,7 +221,7 @@
                 container.appendChild(input);
             });
 
-           
+
 
 
         });
@@ -342,8 +368,114 @@
             selectedFiles.forEach(file => dataTransfer.items.add(file));
             input.files = dataTransfer.files;
         });
-    </script>
+    </script> -->
 
+    <script>
+function assetManager() {
+    return {
+        existingAssets: [],
+        selectedFiles: [],
+        previewFiles: [],
+        allAssets: [],
+
+        initExistingAssets(array) {
+            this.existingAssets = Array.isArray(array) ? array : [];
+            this.syncAllAssets();
+        },
+
+        isImage(path) {
+            return /\.(jpg|jpeg|png|webp|gif)$/i.test(path);
+        },
+
+        syncAllAssets() {
+            const existing = this.existingAssets.map((path, i) => ({
+                key: `existing-${i}`,
+                type: 'existing',
+                name: path.split('/').pop(),
+                preview: this.isImage(path) ? `/storage/${path}` : null
+            }));
+
+            const uploads = this.previewFiles.map((file, i) => ({
+                key: `new-${i}`,
+                type: 'new',
+                name: file.name,
+                preview: file.preview
+            }));
+
+            this.allAssets = [...existing, ...uploads];
+        },
+
+        handleNewFiles(event) {
+            const input = event.target;
+            const newFiles = Array.from(input.files);
+            const combined = [...this.selectedFiles, ...newFiles];
+
+            if (combined.length + this.existingAssets.length > 5) {
+                alert(`Max 5 files allowed.`);
+                input.value = '';
+                return;
+            }
+
+            this.selectedFiles = combined;
+            this.previewFiles = this.selectedFiles.map(file => ({
+                file,
+                name: file.name,
+                preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
+            }));
+
+            const dataTransfer = new DataTransfer();
+            this.selectedFiles.forEach(file => dataTransfer.items.add(file));
+            input.files = dataTransfer.files;
+
+            this.syncAllAssets();
+        },
+
+        removeNewFile(index) {
+            const removed = this.previewFiles.splice(index, 1)[0];
+            if (removed.preview) URL.revokeObjectURL(removed.preview);
+            this.selectedFiles.splice(index, 1);
+
+            const dataTransfer = new DataTransfer();
+            this.selectedFiles.forEach(file => dataTransfer.items.add(file));
+            document.getElementById('assets').files = dataTransfer.files;
+
+            this.syncAllAssets();
+        },
+
+        removeExistingAsset(index) {
+            this.existingAssets.splice(index, 1);
+            this.syncAllAssets();
+        }
+    };
+}
+</script>
+    <script>
+        function stakeholderManager(preselected = []) {
+            return {
+                stakeholders: preselected,
+                addedStakeholders: new Set(preselected.map(u => u.id)),
+
+                addStakeholder(event) {
+                    const userId = event.target.value;
+                    const userName = event.target.options[event.target.selectedIndex].text;
+
+                    if (!userId || this.addedStakeholders.has(userId)) return;
+
+                    this.addedStakeholders.add(userId);
+                    this.stakeholders.push({
+                        id: userId,
+                        name: userName
+                    });
+                    event.target.value = '';
+                },
+
+                removeStakeholder(index) {
+                    const removed = this.stakeholders.splice(index, 1)[0];
+                    this.addedStakeholders.delete(removed.id);
+                }
+            };
+        }
+    </script>
 
 
 </x-app-layout>

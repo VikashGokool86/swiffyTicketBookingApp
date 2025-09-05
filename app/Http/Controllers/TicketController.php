@@ -9,7 +9,7 @@ class TicketController extends Controller
 {
     public function create()
     {
-        $assetsArray = []; // or pull from model if editing
+        $assetsArray = []; // Initialize an empty array for assets
         return view('create-support-ticket', compact('assetsArray'));
         
     }
@@ -49,7 +49,10 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
-        return view('tickets.show', compact('ticket'));
+        $preselectedStakeholders = \App\Models\User::whereIn('id', json_decode($ticket->stakeholders ?? '[]'))->get(['id', 'name'])->map(function ($user) {
+            return ['id' => $user->id, 'name' => $user->name];
+        })->values()->toArray();
+        return view('tickets.show', compact('ticket', 'preselectedStakeholders'));
     }
 
     public function search(Request $request)
