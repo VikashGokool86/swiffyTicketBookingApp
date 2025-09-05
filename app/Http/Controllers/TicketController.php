@@ -11,7 +11,6 @@ class TicketController extends Controller
     {
         $assetsArray = []; // Initialize an empty array for assets
         return view('create-support-ticket', compact('assetsArray'));
-        
     }
 
     public function store(Request $request)
@@ -85,50 +84,48 @@ class TicketController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    $ticket = Ticket::findOrFail($id);
+    {
+        $ticket = Ticket::findOrFail($id);
 
-    $validated = $request->validate([
-        'status' => 'required|string|max:255',
-        'title' => 'required|string|max:255',
-        'description' => 'required|string',
-        'priority' => 'required|string',
-        'stakeholders.*' => 'integer|exists:users,id',
-        'assignee' => 'nullable|integer|exists:users,id',
-        'tshirt_size' => 'nullable|string',
-        'assets.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx',
-        'existing_assets' => 'nullable|string' // comma-separated string from Alpine
-    ]);
+        $validated = $request->validate([
+            'status' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'priority' => 'required|string',
+            'stakeholders.*' => 'integer|exists:users,id',
+            'assignee' => 'nullable|integer|exists:users,id',
+            'tshirt_size' => 'nullable|string',
+            'assets.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx',
+            'existing_assets' => 'nullable|string' // comma-separated string from Alpine
+        ]);
 
-    // Parse existing assets from hidden input
-    $existingAssets = array_filter(explode(',', $request->input('existing_assets', '')));
+        // Parse existing assets from hidden input
+        $existingAssets = array_filter(explode(',', $request->input('existing_assets', '')));
 
-    // Handle new asset uploads
-    $newAssets = [];
-    if ($request->hasFile('assets')) {
-        foreach ($request->file('assets') as $file) {
-            $path = $file->store('tickets/assets', 'public');
-            $newAssets[] = $path;
+        // Handle new asset uploads
+        $newAssets = [];
+        if ($request->hasFile('assets')) {
+            foreach ($request->file('assets') as $file) {
+                $path = $file->store('tickets/assets', 'public');
+                $newAssets[] = $path;
+            }
         }
+
+        // Final asset list = kept + newly uploaded
+        $mergedAssets = array_merge($existingAssets, $newAssets);
+
+        // Update ticket fields
+        $ticket->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'assets' => json_encode($mergedAssets),
+            'status' => $validated['status'],
+            'priority' => $validated['priority'],
+            'tshirt_size' => $validated['tshirt_size'] ?? null,
+            'assignee' => $validated['assignee'] ?? null,
+            'stakeholders' => json_encode($validated['stakeholders'] ?? []),
+        ]);
+
+        return redirect()->route('tickets.show', $ticket->id)->with('success', 'Ticket updated successfully.');
     }
-
-    // Final asset list = kept + newly uploaded
-    $mergedAssets = array_merge($existingAssets, $newAssets);
-
-    // Update ticket fields
-    $ticket->update([
-        'title' => $validated['title'],
-        'description' => $validated['description'],
-        'assets' => json_encode($mergedAssets),
-        'status' => $validated['status'],
-        'priority' => $validated['priority'],
-        'tshirt_size' => $validated['tshirt_size'] ?? null,
-        'assignee' => $validated['assignee'] ?? null,
-        'stakeholders' => json_encode($validated['stakeholders'] ?? []),
-    ]);
-
-    return redirect()->route('tickets.show', $ticket->id)->with('success', 'Ticket updated successfully.');
-}
-
-    
 }
