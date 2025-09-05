@@ -7,89 +7,93 @@
 
     <div class="flex min-h-screen bg-gray-50 gap-x-8">
         @if ($errors->any())
-            <div class="alert alert-danger">
-                <strong>Whoops! Something went wrong.</strong>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+        <div class="alert alert-danger">
+            <strong>Whoops! Something went wrong.</strong>
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
         @endif
 
         @if (session('success'))
-            <div class="mb-4 text-green-600 font-semibold">
-                {{ session('success') }}
-            </div>
+        <div class="mb-4 text-green-600 font-semibold">
+            {{ session('success') }}
+        </div>
         @endif
 
         <!-- Main Form -->
         <main class="flex-1 flex px-10 py-8">
             <div class="w-full max-w-3xl p-6 bg-white rounded-lg shadow" style="margin-left:10px;">
-                <form action="{{ route('tickets.update', $ticket->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('tickets.update', $ticket->id) }}" method="POST" enctype="multipart/form-data" onsubmit="syncSidePanelFields()">
                     @csrf
                     @method('PUT')
 
+                    <!-- Title -->
                     <div class="mb-3">
                         <label class="block text-lg font-semibold mb-1">Title</label>
                         <input type="text" name="title" class="w-full border rounded px-3 py-2"
-                               value="{{ old('title', $ticket->title) }}" required>
+                            value="{{ old('title', $ticket->title) }}" required>
                         @error('title')
-                            <div class="text-red-600 text-sm mt-1">{{ $message }}</div>
+                        <div class="text-red-600 text-sm mt-1">{{ $message }}</div>
                         @enderror
                     </div>
 
+                    <!-- Description -->
                     <div class="mb-3">
                         <label class="block text-lg font-semibold mb-1">Description</label>
                         <textarea name="description" rows="6" class="w-full border rounded px-3 py-2" required>{{ old('description', $ticket->description) }}</textarea>
                         @error('description')
-                            <div class="text-red-600 text-sm mt-1">{{ $message }}</div>
+                        <div class="text-red-600 text-sm mt-1">{{ $message }}</div>
                         @enderror
                     </div>
 
+                    <!-- Assets -->
                     <div class="mb-3">
                         <label class="block text-lg font-semibold mb-1">Upload New Assets</label>
                         <input type="file" name="assets[]" multiple
-                               accept=".pdf,.doc,.docx,image/jpeg,image/png,image/svg+xml"
-                               class="w-full border rounded px-3 py-2" id="assets-input" onchange="handleFilePreview(this)">
+                            accept=".pdf,.doc,.docx,image/jpeg,image/png,image/svg+xml"
+                            class="w-full border rounded px-3 py-2" id="assets-input" onchange="handleFilePreview(this)">
                         <small class="text-gray-500">Max 5 files. Allowed: PDF, Word, JPG, PNG, SVG</small>
                         <div id="assets-preview" class="mt-2 flex flex-wrap gap-2">
                             @foreach(json_decode($ticket->assets, true) ?? [] as $asset)
-                                <div class="border rounded p-2 bg-gray-100">
-                                    @if(Str::endsWith($asset, ['.jpg', '.jpeg', '.png']))
-                                        <img src="{{ asset('storage/' . $asset) }}" class="h-16 w-16 object-contain" alt="Asset">
-                                    @else
-                                        <span class="text-sm">📄 {{ basename($asset) }}</span>
-                                    @endif
-                                </div>
+                            <div class="border rounded p-2 bg-gray-100">
+                                @if(Str::endsWith($asset, ['.jpg', '.jpeg', '.png']))
+                                <img src="{{ asset('storage/' . $asset) }}" class="h-16 w-16 object-contain" alt="Asset">
+                                @else
+                                <span class="text-sm">📄 {{ basename($asset) }}</span>
+                                @endif
+                            </div>
                             @endforeach
                         </div>
                     </div>
 
-                    <!-- Hidden fields for syncing side panel -->
+                    <!-- Hidden fields synced from side panel -->
                     <input type="hidden" name="status" id="status-hidden" value="{{ old('status', $ticket->status) }}">
                     <input type="hidden" name="priority" id="priority-hidden" value="{{ old('priority', $ticket->priority) }}">
                     <input type="hidden" name="tshirt_size" id="tshirt-size-hidden" value="{{ old('tshirt_size', $ticket->tshirt_size) }}">
                     <input type="hidden" name="assignee" id="assignee-hidden" value="{{ old('assignee', $ticket->assignee) }}">
                     <input type="hidden" name="stakeholders" id="stakeholders-hidden" value="{{ old('stakeholders', json_encode($ticket->stakeholders)) }}">
-                    <div id="stakeholders-hidden-container"></div>
 
+                    <!-- Submit -->
                     <div class="mt-6 flex gap-4">
                         <button type="submit"
-                                class="bg-blue-700 text-white font-semibold px-4 py-2 rounded hover:bg-blue-800 transition">
+                            class="bg-blue-700 text-white font-semibold px-4 py-2 rounded hover:bg-blue-800 transition">
                             Update Ticket
                         </button>
-
-                        <form action="{{ route('tickets.destroy', $ticket->id) }}" method="POST"
-                              onsubmit="return confirm('Are you sure you want to delete this ticket?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                    class="bg-red-600 text-white font-semibold px-4 py-2 rounded hover:bg-red-700 transition">
-                                Delete Ticket
-                            </button>
-                        </form>
                     </div>
+                </form>
+
+                <!-- Separate Delete Form -->
+                <form action="{{ route('tickets.destroy', $ticket->id) }}" method="POST"
+                    onsubmit="return confirm('Are you sure you want to delete this ticket?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                        class="bg-red-600 text-white font-semibold px-4 py-2 rounded hover:bg-red-700 transition">
+                        Delete Ticket
+                    </button>
                 </form>
             </div>
         </main>
@@ -125,9 +129,9 @@
                 <select id="assignee-select" class="w-full border rounded px-2 py-1">
                     <option value="">-- Select an assignee --</option>
                     @foreach(\App\Models\User::all() as $user)
-                        <option value="{{ $user->id }}" {{ $ticket->assignee == $user->id ? 'selected' : '' }}>
-                            {{ $user->name }}
-                        </option>
+                    <option value="{{ $user->id }}" {{ $ticket->assignee == $user->id ? 'selected' : '' }}>
+                        {{ $user->name }}
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -137,17 +141,17 @@
                 <select id="stakeholder-select" class="w-full border rounded px-2 py-1">
                     <option value="">-- Select a stakeholder --</option>
                     @foreach(\App\Models\User::all() as $user)
-                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    <option value="{{ $user->id }}">{{ $user->name }}</option>
                     @endforeach
                 </select>
 
                 <div id="selected-stakeholders" class="mt-3 space-y-1">
                     @foreach(json_decode($ticket->stakeholders, true) ?? [] as $id)
-                        <div class="flex items-center justify-between bg-gray-100 px-2 py-1 rounded">
-                            <span>{{ \App\Models\User::find($id)->name ?? 'Unknown' }}</span>
-                            <input type="hidden" name="stakeholders[]" value="{{ $id }}">
-                            <button type="button" class="text-red-500 hover:text-red-700 remove-btn">Remove</button>
-                        </div>
+                    <div class="flex items-center justify-between bg-gray-100 px-2 py-1 rounded">
+                        <span>{{ \App\Models\User::find($id)->name ?? 'Unknown' }}</span>
+                        <input type="hidden" name="stakeholders[]" value="{{ $id }}">
+                        <button type="button" class="text-red-500 hover:text-red-700 remove-btn">Remove</button>
+                    </div>
                     @endforeach
                 </div>
             </div>
@@ -166,7 +170,7 @@
             </div>
         </aside>
     </div>
-     <script>
+    <script>
         // Sync side panel values to hidden fields before submit
         document.querySelector('form').addEventListener('submit', function(e) {
             // Sync scalar values
@@ -190,6 +194,10 @@
                 input.value = id;
                 container.appendChild(input);
             });
+
+           
+
+
         });
 
         const select = document.getElementById('stakeholder-select');
@@ -261,34 +269,60 @@
             tshirtSizeHidden.value = this.value;
         });
 
-        function handleFilePreview(input) {
-            const preview = document.getElementById('assets-preview');
-            preview.innerHTML = '';
-            const files = Array.from(input.files).slice(0, 5); // Limit to 5 files
 
-            if (input.files.length > 5) {
-                alert('You can only upload up to 5 files.');
-                input.value = '';
+
+
+        let selectedFiles = [];
+
+        function handleFilePreview(input) {
+            const newFiles = Array.from(input.files);
+
+            // Combine existing and new files
+            const combinedFiles = [...selectedFiles, ...newFiles];
+
+            if (combinedFiles.length > 5) {
+                alert(`You can only upload up to 5 files total. You already have ${selectedFiles.length}.`);
+                input.value = ''; // Clear input to prevent accidental re-submission
                 return;
             }
 
-            files.forEach(file => {
-                const fileType = file.type;
-                const fileDiv = document.createElement('div');
-                fileDiv.className = "border rounded p-2 bg-gray-100";
+            selectedFiles = combinedFiles;
+            input.value = ''; // Reset input so same file can be re-added if removed
 
-                // Image preview
-                if (fileType.startsWith('image/')) {
+            appendToPreview(newFiles);
+        }
+
+        function appendToPreview(files) {
+            const preview = document.getElementById('assets-preview');
+
+            files.forEach((file, index) => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = "relative border rounded p-2 bg-gray-100";
+                fileDiv.style.position = "relative";
+
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = "✖";
+                removeBtn.className = "absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-sm font-bold hover:bg-red-700 z-10";
+                removeBtn.onclick = () => {
+                    const idx = selectedFiles.indexOf(file);
+                    if (idx !== -1) {
+                        selectedFiles.splice(idx, 1);
+                        fileDiv.remove();
+                    }
+                };
+
+                fileDiv.appendChild(removeBtn);
+
+                if (file.type.startsWith('image/')) {
                     const img = document.createElement('img');
-                    img.className = "h-16 w-16 object-contain";
+                    img.className = "h-16 w-16 object-contain mt-4";
                     img.src = URL.createObjectURL(file);
                     img.onload = () => URL.revokeObjectURL(img.src);
                     fileDiv.appendChild(img);
                 } else {
-                    // File icon and name for non-images
                     const icon = document.createElement('span');
-                    icon.className = "inline-block mr-2";
                     icon.textContent = "📄";
+                    icon.className = "inline-block mr-2";
                     fileDiv.appendChild(icon);
 
                     const name = document.createElement('span');
@@ -299,6 +333,17 @@
                 preview.appendChild(fileDiv);
             });
         }
+
+
+        document.querySelector('form[action*="tickets/update"]').addEventListener('submit', function() {
+            const input = document.getElementById('assets-input');
+            const dataTransfer = new DataTransfer();
+
+            selectedFiles.forEach(file => dataTransfer.items.add(file));
+            input.files = dataTransfer.files;
+        });
     </script>
+
+
 
 </x-app-layout>

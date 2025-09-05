@@ -228,21 +228,75 @@
             tshirtSizeHidden.value = this.value;
         });
 
+        // function handleFilePreview(input) {
+        //     const preview = document.getElementById('assets-preview');
+        //     preview.innerHTML = '';
+        //     const files = Array.from(input.files).slice(0, 5); // Limit to 5 files
+
+        //     if (input.files.length > 5) {
+        //         alert('You can only upload up to 5 files.');
+        //         input.value = '';
+        //         return;
+        //     }
+
+        //     files.forEach(file => {
+        //         const fileType = file.type;
+        //         const fileDiv = document.createElement('div');
+        //         fileDiv.className = "border rounded p-2 bg-gray-100";
+
+        //         // Image preview
+        //         if (fileType.startsWith('image/')) {
+        //             const img = document.createElement('img');
+        //             img.className = "h-16 w-16 object-contain";
+        //             img.src = URL.createObjectURL(file);
+        //             img.onload = () => URL.revokeObjectURL(img.src);
+        //             fileDiv.appendChild(img);
+        //         } else {
+        //             // File icon and name for non-images
+        //             const icon = document.createElement('span');
+        //             icon.className = "inline-block mr-2";
+        //             icon.textContent = "📄";
+        //             fileDiv.appendChild(icon);
+
+        //             const name = document.createElement('span');
+        //             name.textContent = file.name;
+        //             fileDiv.appendChild(name);
+        //         }
+
+        //         preview.appendChild(fileDiv);
+        //     });
+        // }
+    </script>
+    <script>
+        let selectedFiles = [];
+
         function handleFilePreview(input) {
             const preview = document.getElementById('assets-preview');
             preview.innerHTML = '';
-            const files = Array.from(input.files).slice(0, 5); // Limit to 5 files
+            selectedFiles = Array.from(input.files).slice(0, 5); // Limit to 5 files
 
             if (input.files.length > 5) {
                 alert('You can only upload up to 5 files.');
                 input.value = '';
+                selectedFiles = [];
                 return;
             }
 
-            files.forEach(file => {
+            selectedFiles.forEach((file, index) => {
                 const fileType = file.type;
                 const fileDiv = document.createElement('div');
-                fileDiv.className = "border rounded p-2 bg-gray-100";
+                fileDiv.className = "relative border rounded p-2 bg-gray-100 inline-block mr-2 mb-2";
+
+                // Close button
+                const closeBtn = document.createElement('button');
+                closeBtn.textContent = '❌';
+                closeBtn.className = "absolute top-0 right-0 text-xs bg-white rounded-full px-1 py-0.5 shadow";
+                closeBtn.onclick = () => {
+                    selectedFiles.splice(index, 1);
+                    updateFileInput(input);
+                    handleFilePreview(input);
+                };
+                fileDiv.appendChild(closeBtn);
 
                 // Image preview
                 if (fileType.startsWith('image/')) {
@@ -252,7 +306,6 @@
                     img.onload = () => URL.revokeObjectURL(img.src);
                     fileDiv.appendChild(img);
                 } else {
-                    // File icon and name for non-images
                     const icon = document.createElement('span');
                     icon.className = "inline-block mr-2";
                     icon.textContent = "📄";
@@ -266,5 +319,14 @@
                 preview.appendChild(fileDiv);
             });
         }
+
+        // Helper to update input.files with selectedFiles
+        function updateFileInput(input) {
+            const dataTransfer = new DataTransfer();
+            selectedFiles.forEach(file => dataTransfer.items.add(file));
+            input.files = dataTransfer.files;
+        }
     </script>
+
+
 </x-app-layout>
