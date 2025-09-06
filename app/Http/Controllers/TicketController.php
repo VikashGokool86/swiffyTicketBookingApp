@@ -97,8 +97,6 @@ class TicketController extends Controller
 
     public function update(Request $request, $id)
     {
-        $ticket = Ticket::findOrFail($id);
-
         $validated = $request->validate([
             'status' => 'required|string|max:255',
             'title' => 'required|string|max:255',
@@ -110,6 +108,8 @@ class TicketController extends Controller
             'assets.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx',
             'existing_assets' => 'nullable|string' // comma-separated string from Alpine
         ]);
+
+        $ticket = Ticket::findOrFail($id);
 
         // Parse existing assets from hidden input
         $existingAssets = array_filter(explode(',', $request->input('existing_assets', '')));
