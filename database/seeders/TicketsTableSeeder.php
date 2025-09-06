@@ -11,7 +11,7 @@ class TicketsTableSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create();
+        $faker = Faker::create('en_ZA');
 
         // Simulated asset filenames (these should exist in your storage or public folder)
           $assets = [
@@ -37,7 +37,7 @@ class TicketsTableSeeder extends Seeder
                 'description' => $faker->paragraph,
                 'status' => $faker->randomElement($statuses),
                 'priority' => $faker->randomElement($priorities),
-                'assignee' => $faker->numberBetween(1, 80),
+                'assignee' => $faker->boolean(70) ? $faker->numberBetween(1, 80) : null,
                 'stakeholders' => json_encode($faker->randomElements(range(1, 80), rand(1, 3))),
                 'tshirt_size' => $faker->randomElement($sizes),
                 'assets' => json_encode($faker->randomElements($assets, 3)),
