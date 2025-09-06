@@ -19,8 +19,10 @@
 
         <!-- Success Message -->
         @if (session('success'))
-        <div class="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-md shadow-sm">
-            <div class="font-semibold">{{ session('success') }}</div>
+        <div class="flex justify-center">
+            <div class="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-md shadow-sm">
+                <div class="font-semibold">{{ session('success') }}</div>
+            </div>
         </div>
         @endif
     </div>
