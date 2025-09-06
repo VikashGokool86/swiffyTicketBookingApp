@@ -104,19 +104,24 @@
                             class="bg-blue-700 text-white font-semibold px-4 py-2 rounded hover:bg-blue-800 transition">
                             Update Ticket
                         </button>
+                        <button type="button"
+                            onclick="document.getElementById('delete-form').submit()"
+                            class="bg-red-600 text-white font-semibold px-4 py-2 rounded hover:bg-red-700 transition">
+                            Delete Ticket
+                        </button>
+
                     </div>
                 </form>
 
                 <!-- Separate Delete Form -->
-                <form action="{{ route('tickets.destroy', $ticket->id) }}" method="POST"
-                    onsubmit="return confirm('Are you sure you want to delete this ticket?')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                        class="bg-red-600 text-white font-semibold px-4 py-2 rounded hover:bg-red-700 transition">
-                        Delete Ticket
-                    </button>
-                </form>
+                <div id="delete-form-container" class="hidden">
+                    <form id="delete-form" action="{{ route('tickets.destroy', $ticket->id) }}" method="POST"
+                        onsubmit="return confirm('Are you sure you want to delete this ticket?')">
+                        @csrf
+                        @method('DELETE')
+                    </form>
+                </div>
+
             </div>
         </main>
 
