@@ -7,19 +7,20 @@
     <div class="space-y-4">
         <!-- Validation Errors -->
         @if ($errors->any())
-        <div class="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-md shadow-sm">
-            <div class="font-semibold mb-2">Whoops! Something went wrong.</div>
-            <ul class="list-disc list-inside space-y-1 text-sm">
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        <div class="text-center">
+            <div class="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-md shadow-sm">
+                <div class="font-semibold mb-2">Whoops! Something went wrong.</div>
+                <ul class="list-disc list-inside space-y-1 text-sm">
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
         @endif
-
         <!-- Success Message -->
         @if (session('success'))
-        <div class="flex justify-center">
+        <div class="text-center">
             <div class="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-md shadow-sm">
                 <div class="font-semibold">{{ session('success') }}</div>
             </div>

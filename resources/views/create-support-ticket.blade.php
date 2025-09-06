@@ -5,39 +5,30 @@
             {{ __('Create Support Ticket') }}
         </h2>
     </x-slot>
-    <div x-data="ticketFormManager()" x-init="initExistingAssets(@json($assetsArray))" class="flex min-h-screen">
-        <div class="flex flex-col gap-y-4 max-w-3xl mx-auto mt-6">
-            @if ($errors->any())
-            <div class="bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-lg shadow-sm">
-                <div class="flex items-center gap-x-2 mb-2">
-                    <!-- Heroicon: Exclamation -->
-                    <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 9v2m0 4h.01M12 5a7 7 0 100 14 7 7 0 000-14z" />
-                    </svg>
-                    <strong class="font-semibold">Whoops! Something went wrong.</strong>
-                </div>
-                <ul class="list-disc list-inside text-sm space-y-1">
+    <div class="space-y-4">
+        <!-- Validation Errors -->
+        @if ($errors->any())
+        <div class="text-center">
+            <div class="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-md shadow-sm">
+                <div class="font-semibold mb-2">Whoops! Something went wrong.</div>
+                <ul class="list-disc list-inside space-y-1 text-sm">
                     @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                     @endforeach
                 </ul>
             </div>
-            @endif
-
-            @if (session('success'))
-            <div class="bg-green-50 border border-green-200 text-green-700 px-5 py-4 rounded-lg shadow-sm flex items-center gap-x-2">
-                <!-- Heroicon: Check Circle -->
-                <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m1-4a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="font-medium">{{ session('success') }}</span>
-            </div>
-            @endif
         </div>
+        @endif
+        <!-- Success Message -->
+        @if (session('success'))
+        <div class="text-center">
+            <div class="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-md shadow-sm">
+                <div class="font-semibold">{{ session('success') }}</div>
+            </div>
+        </div>
+        @endif
+    </div>
+    <div x-data="ticketFormManager()" x-init="initExistingAssets(@json($assetsArray))" class="flex min-h-screen">
         <!-- Main Form -->
         <main class="flex-1 flex justify-center items-start px-10 py-8">
 
