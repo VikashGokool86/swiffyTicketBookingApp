@@ -4,12 +4,12 @@
             {{ __('Show Support Ticket') }}
         </h2>
     </x-slot>
-
-    <div class="flex min-h-screen bg-gray-50 gap-x-8">
+    <div class="space-y-4">
+        <!-- Validation Errors -->
         @if ($errors->any())
-        <div class="alert alert-danger">
-            <strong>Whoops! Something went wrong.</strong>
-            <ul>
+        <div class="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-md shadow-sm">
+            <div class="font-semibold mb-2">Whoops! Something went wrong.</div>
+            <ul class="list-disc list-inside space-y-1 text-sm">
                 @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
                 @endforeach
@@ -17,12 +17,14 @@
         </div>
         @endif
 
+        <!-- Success Message -->
         @if (session('success'))
-        <div class="mb-4 text-green-600 font-semibold">
-            {{ session('success') }}
+        <div class="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-md shadow-sm">
+            <div class="font-semibold">{{ session('success') }}</div>
         </div>
         @endif
-
+    </div>
+    <div x-data="ticketFormManager()" x-init="initTicketData(window.ticketData)" class="flex min-h-screen bg-gray-50 gap-x-8">
         <!-- Main Form -->
         <main class="flex-1 flex px-10 py-8">
             <div class="w-full max-w-3xl p-6 bg-white rounded-lg shadow" style="margin-left:10px;">
@@ -48,47 +50,50 @@
                         <div class="text-red-600 text-sm mt-1">{{ $message }}</div>
                         @enderror
                     </div>
-<script>
-    window.existingAssets = @json(json_decode($ticket->assets, true));
-</script>
+                    <script>
+                        window.existingAssets = @json(json_decode($ticket->assets, true));
+                    </script>
                     <!-- Assets -->
-                   <div x-data="assetManager()" x-init="initExistingAssets(window.existingAssets)" class="space-y-4">
-    <label class="block text-sm font-medium text-gray-700 mb-1">Upload Assets</label>
-    <input type="file" id="assets" name="assets[]" multiple
-        accept=".jpg,.jpeg,.png,.pdf,.docx"
-        @change="handleNewFiles($event)"
-        class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-blue-500">
-    <p class="text-xs text-gray-500 mt-1">Max 5 files. Allowed: PDF, Word, JPG, PNG</p>
+                    <div x-data="assetManager()" x-init="initExistingAssets(window.existingAssets)" class="space-y-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Upload Assets</label>
+                        <input type="file" id="assets" name="assets[]" multiple
+                            accept=".jpg,.jpeg,.png,.pdf,.docx"
+                            @change="handleNewFiles($event)"
+                            class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">Max 5 files. Allowed: PDF, Word, JPG, PNG</p>
 
-    <div class="mt-2 flex flex-wrap gap-2">
-        <template x-for="(item, index) in allAssets" :key="item.key">
-            <div class="relative border rounded p-2 bg-gray-100 inline-block">
-                <button type="button"
-                    class="absolute top-0 right-0 bg-white text-xs px-1 py-0.5 rounded-full shadow hover:bg-red-100"
-                    @click="item.type === 'existing' ? removeExistingAsset(index) : removeNewFile(index)">
-                    ❌
-                </button>
+                        <div class="mt-2 flex flex-wrap gap-2">
+                            <template x-for="(item, index) in allAssets" :key="item.key">
+                                <div class="relative border rounded p-2 bg-gray-100 inline-block">
+                                    <button type="button"
+                                        class="absolute top-0 right-0 bg-white text-xs px-1 py-0.5 rounded-full shadow hover:bg-red-100"
+                                        @click="item.type === 'existing' ? removeExistingAsset(index) : removeNewFile(index)">
+                                        ❌
+                                    </button>
 
-                <template x-if="item.preview">
-                    <img :src="item.preview" class="h-16 w-16 object-contain" alt="">
-                </template>
+                                    <template x-if="item.preview">
+                                        <img :src="item.preview" class="h-16 w-16 object-contain" alt="">
+                                    </template>
 
-                <template x-if="!item.preview">
-                    <span class="text-sm">📄 <span x-text="item.name"></span></span>
-                </template>
-            </div>
-        </template>
-    </div>
+                                    <template x-if="!item.preview">
+                                        <span class="text-sm">📄 <span x-text="item.name"></span></span>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
 
-    <input type="hidden" name="existing_assets" :value="existingAssets.join(',')">
-</div>
+                        <input type="hidden" name="existing_assets" :value="existingAssets.join(',')">
+                    </div>
 
                     <!-- Hidden fields synced from side panel -->
-                    <input type="hidden" name="status" id="status-hidden" value="{{ old('status', $ticket->status) }}">
-                    <input type="hidden" name="priority" id="priority-hidden" value="{{ old('priority', $ticket->priority) }}">
-                    <input type="hidden" name="tshirt_size" id="tshirt-size-hidden" value="{{ old('tshirt_size', $ticket->tshirt_size) }}">
-                    <input type="hidden" name="assignee" id="assignee-hidden" value="{{ old('assignee', $ticket->assignee) }}">
-                    <input type="hidden" name="stakeholders" id="stakeholders-hidden" value="{{ old('stakeholders', json_encode($ticket->stakeholders)) }}">
+                    <input type="hidden" name="status" id="status-hidden" :value="status">
+                    <input type="hidden" name="priority" id="priority-hidden" :value="priority">
+                    <input type="hidden" name="tshirt_size" id="tshirt-size-hidden" :value="tshirtSize">
+                    <input type="hidden" name="assignee" id="assignee-hidden" :value="assignee">
+
+                    <template x-for="user in stakeholders" :key="'hidden-' + user.id">
+                        <input type="hidden" name="stakeholders[]" :value="user.id">
+                    </template>
 
                     <!-- Submit -->
                     <div class="mt-6 flex gap-4">
@@ -118,7 +123,7 @@
 
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-1">Status</label>
-                <select id="status-select" class="w-full border rounded px-2 py-1" required>
+                <select x-model="status" id="status-select" class="w-full border rounded px-2 py-1" required>
                     <option value="">-- Select a status --</option>
                     <option value="O" {{ $ticket->status === 'O' ? 'selected' : '' }}>Opened</option>
                     <option value="P" {{ $ticket->status === 'P' ? 'selected' : '' }}>In Progress</option>
@@ -129,7 +134,7 @@
 
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-1">Priority</label>
-                <select id="priority-select" class="w-full border rounded px-2 py-1">
+                <select x-model="priority" id="priority-select" class="w-full border rounded px-2 py-1">
                     <option value="">-- Select a priority --</option>
                     <option value="L" {{ $ticket->priority === 'L' ? 'selected' : '' }}>Low</option>
                     <option value="M" {{ $ticket->priority === 'M' ? 'selected' : '' }}>Medium</option>
@@ -140,7 +145,7 @@
 
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-1">Assignee</label>
-                <select id="assignee-select" class="w-full border rounded px-2 py-1">
+                <select x-model="assignee" id="assignee-select" class="w-full border rounded px-2 py-1">
                     <option value="">-- Select an assignee --</option>
                     @foreach(\App\Models\User::all() as $user)
                     <option value="{{ $user->id }}" {{ $ticket->assignee == $user->id ? 'selected' : '' }}>
@@ -152,7 +157,7 @@
 
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-1">T-Shirt Size</label>
-                <select id="tshirt-size-select" class="w-full border rounded px-2 py-1">
+                <select x-model="tshirtSize" id="tshirt-size-select" class="w-full border rounded px-2 py-1">
                     <option value="">-- Select a tshirt size --</option>
                     <option value="XS" {{ $ticket->tshirt_size === 'XS' ? 'selected' : '' }}>XS</option>
                     <option value="S" {{ $ticket->tshirt_size === 'S' ? 'selected' : '' }}>S</option>
@@ -162,298 +167,195 @@
                     <option value="XXL" {{ $ticket->tshirt_size === 'XXL' ? 'selected' : '' }}>XXL</option>
                 </select>
             </div>
-
             <div class="mb-4">
-                <div class="mt-4 w-full" x-data="stakeholderManager(@json($preselectedStakeholders))">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Stakeholders</label>
-
-                    <select @change="addStakeholder($event)" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                <div class="mt-4 w-full" x-data="stakeholderManager()" x-init="initStakeholders(window.ticketStakeholders)">
+                    <label class="block text-sm font-medium mb-1">Stakeholders</label>
+                    <select @change="addStakeholder($event)" class="w-full border rounded px-2 py-1">
                         <option value="">-- Select a stakeholder --</option>
                         @foreach(\App\Models\User::all() as $user)
                         <option value="{{ $user->id }}">{{ $user->name }}</option>
                         @endforeach
                     </select>
 
-                    <div class="mt-3 space-y-2 w-full">
+                    <div class="mt-3 space-y-2">
                         <template x-for="(user, index) in stakeholders" :key="user.id">
-                            <div class="flex items-center justify-between bg-gray-100 px-3 py-2 rounded w-full">
-                                <span x-text="user.name" class="truncate"></span>
-                                <button type="button"
-                                    class="text-red-500 hover:text-red-700 text-sm"
-                                    @click="removeStakeholder(index)">
-                                    Remove
-                                </button>
+                            <div class="flex items-center justify-between bg-gray-100 px-3 py-2 rounded">
+                                <span x-text="user.name"></span>
+                                <button type="button" class="text-red-500 hover:text-red-700 text-sm" @click="removeStakeholder(index)">Remove</button>
                             </div>
                         </template>
                     </div>
-
-                    <template x-for="user in stakeholders" :key="'hidden-' + user.id">
-                        <input type="hidden" name="stakeholders[]" :value="user.id">
-                    </template>
                 </div>
-            </div>
 
 
         </aside>
     </div>
-    <!-- <script>
-        // Sync side panel values to hidden fields before submit
-        document.querySelector('form').addEventListener('submit', function(e) {
-            // Sync scalar values
-            document.getElementById('status-hidden').value = statusHidden.value;
-            document.getElementById('priority-hidden').value = priorityHidden.value;
-            document.getElementById('tshirt-size-hidden').value = tshirtSizeSelect.value;
-            document.getElementById('assignee-hidden').value = assigneeSelect.value;
-
-            // Clear previous stakeholder inputs
-            const container = document.getElementById('stakeholders-hidden-container');
-            container.innerHTML = '';
-
-            // Sync stakeholder array
-            const stakeholderIds = Array.from(document.querySelectorAll('#selected-stakeholders input[name="stakeholders[]"]'))
-                .map(input => input.value);
-
-            stakeholderIds.forEach(id => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'stakeholders[]';
-                input.value = id;
-                container.appendChild(input);
-            });
-
-
-
-
-        });
-
-        const select = document.getElementById('stakeholder-select');
-        const container = document.getElementById('selected-stakeholders');
-        const hiddenContainer = document.getElementById('stakeholders-hidden-container');
-        const added = new Set();
-
-        select.addEventListener('change', function() {
-            const userId = this.value;
-            const userName = this.options[this.selectedIndex].text;
-
-            if (!userId || added.has(userId)) return;
-
-            added.add(userId);
-
-            // Visible UI element
-            const displayWrapper = document.createElement('div');
-            displayWrapper.className = "flex items-center justify-between bg-gray-100 px-2 py-1 rounded";
-
-            displayWrapper.innerHTML = `
-                <span>${userName}</span>
-                <button type="button" class="text-red-500 hover:text-red-700 remove-btn">Remove</button>
-            `;
-
-            container.appendChild(displayWrapper);
-
-            // Hidden input for form submission
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'stakeholders[]';
-            hiddenInput.value = userId;
-
-            hiddenContainer.appendChild(hiddenInput);
-
-            // Remove logic
-            displayWrapper.querySelector('.remove-btn').addEventListener('click', () => {
-                added.delete(userId);
-                displayWrapper.remove();
-                hiddenInput.remove();
-            });
-
-            this.value = ""; // Reset dropdown
-        });
-
-        // Live syncing for priority and tshirt_size dropdowns
-        const statusSelect = document.getElementById('status-select');
-        const prioritySelect = document.getElementById('priority-select');
-        const assigneeSelect = document.getElementById('assignee-select');
-        const tshirtSizeSelect = document.getElementById('tshirt-size-select');
-
-        const statusHidden = document.getElementById('status-hidden');
-        const priorityHidden = document.getElementById('priority-hidden');
-        const assigneeHidden = document.getElementById('assignee-hidden');
-        const tshirtSizeHidden = document.getElementById('tshirt-size-hidden');
-
-        statusSelect.addEventListener('change', function() {
-            statusHidden.value = this.value;
-        });
-
-        prioritySelect.addEventListener('change', function() {
-            priorityHidden.value = this.value;
-        });
-
-        assigneeSelect.addEventListener('change', function() {
-            assigneeHidden.value = this.value;
-        });
-
-        tshirtSizeSelect.addEventListener('change', function() {
-            tshirtSizeHidden.value = this.value;
-        });
-
-
-
-
-        let selectedFiles = [];
-
-        function handleFilePreview(input) {
-            const newFiles = Array.from(input.files);
-
-            // Combine existing and new files
-            const combinedFiles = [...selectedFiles, ...newFiles];
-
-            if (combinedFiles.length > 5) {
-                alert(`You can only upload up to 5 files total. You already have ${selectedFiles.length}.`);
-                input.value = ''; // Clear input to prevent accidental re-submission
-                return;
-            }
-
-            selectedFiles = combinedFiles;
-            input.value = ''; // Reset input so same file can be re-added if removed
-
-            appendToPreview(newFiles);
-        }
-
-        function appendToPreview(files) {
-            const preview = document.getElementById('assets-preview');
-
-            files.forEach((file, index) => {
-                const fileDiv = document.createElement('div');
-                fileDiv.className = "relative border rounded p-2 bg-gray-100";
-                fileDiv.style.position = "relative";
-
-                const removeBtn = document.createElement('button');
-                removeBtn.textContent = "✖";
-                removeBtn.className = "absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-sm font-bold hover:bg-red-700 z-10";
-                removeBtn.onclick = () => {
-                    const idx = selectedFiles.indexOf(file);
-                    if (idx !== -1) {
-                        selectedFiles.splice(idx, 1);
-                        fileDiv.remove();
-                    }
-                };
-
-                fileDiv.appendChild(removeBtn);
-
-                if (file.type.startsWith('image/')) {
-                    const img = document.createElement('img');
-                    img.className = "h-16 w-16 object-contain mt-4";
-                    img.src = URL.createObjectURL(file);
-                    img.onload = () => URL.revokeObjectURL(img.src);
-                    fileDiv.appendChild(img);
-                } else {
-                    const icon = document.createElement('span');
-                    icon.textContent = "📄";
-                    icon.className = "inline-block mr-2";
-                    fileDiv.appendChild(icon);
-
-                    const name = document.createElement('span');
-                    name.textContent = file.name;
-                    fileDiv.appendChild(name);
-                }
-
-                preview.appendChild(fileDiv);
-            });
-        }
-
-
-        document.querySelector('form[action*="tickets/update"]').addEventListener('submit', function() {
-            const input = document.getElementById('assets-input');
-            const dataTransfer = new DataTransfer();
-
-            selectedFiles.forEach(file => dataTransfer.items.add(file));
-            input.files = dataTransfer.files;
-        });
-    </script> -->
-
     <script>
-function assetManager() {
-    return {
-        existingAssets: [],
-        selectedFiles: [],
-        previewFiles: [],
-        allAssets: [],
-
-        initExistingAssets(array) {
-            this.existingAssets = Array.isArray(array) ? array : [];
-            this.syncAllAssets();
-        },
-
-        isImage(path) {
-            return /\.(jpg|jpeg|png|webp|gif)$/i.test(path);
-        },
-
-        syncAllAssets() {
-            const existing = this.existingAssets.map((path, i) => ({
-                key: `existing-${i}`,
-                type: 'existing',
-                name: path.split('/').pop(),
-                preview: this.isImage(path) ? `/storage/${path}` : null
-            }));
-
-            const uploads = this.previewFiles.map((file, i) => ({
-                key: `new-${i}`,
-                type: 'new',
-                name: file.name,
-                preview: file.preview
-            }));
-
-            this.allAssets = [...existing, ...uploads];
-        },
-
-        handleNewFiles(event) {
-            const input = event.target;
-            const newFiles = Array.from(input.files);
-            const combined = [...this.selectedFiles, ...newFiles];
-
-            if (combined.length + this.existingAssets.length > 5) {
-                alert(`Max 5 files allowed.`);
-                input.value = '';
-                return;
-            }
-
-            this.selectedFiles = combined;
-            this.previewFiles = this.selectedFiles.map(file => ({
-                file,
-                name: file.name,
-                preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
-            }));
-
-            const dataTransfer = new DataTransfer();
-            this.selectedFiles.forEach(file => dataTransfer.items.add(file));
-            input.files = dataTransfer.files;
-
-            this.syncAllAssets();
-        },
-
-        removeNewFile(index) {
-            const removed = this.previewFiles.splice(index, 1)[0];
-            if (removed.preview) URL.revokeObjectURL(removed.preview);
-            this.selectedFiles.splice(index, 1);
-
-            const dataTransfer = new DataTransfer();
-            this.selectedFiles.forEach(file => dataTransfer.items.add(file));
-            document.getElementById('assets').files = dataTransfer.files;
-
-            this.syncAllAssets();
-        },
-
-        removeExistingAsset(index) {
-            this.existingAssets.splice(index, 1);
-            this.syncAllAssets();
-        }
-    };
-}
-</script>
-    <script>
-        function stakeholderManager(preselected = []) {
+        function assetManager() {
             return {
-                stakeholders: preselected,
-                addedStakeholders: new Set(preselected.map(u => u.id)),
+                existingAssets: [],
+                selectedFiles: [],
+                previewFiles: [],
+                allAssets: [],
+                initExistingAssets(array) {
+                    this.existingAssets = Array.isArray(array) ? array : [];
+                    this.syncAllAssets();
+                },
+
+                isImage(path) {
+                    return /\.(jpg|jpeg|png|webp|gif)$/i.test(path);
+                },
+
+                syncAllAssets() {
+                    const existing = this.existingAssets.map((path, i) => ({
+                        key: `existing-${i}`,
+                        type: 'existing',
+                        name: path.split('/').pop(),
+                        preview: this.isImage(path) ? `/storage/${path}` : null
+                    }));
+
+                    const uploads = this.previewFiles.map((file, i) => ({
+                        key: `new-${i}`,
+                        type: 'new',
+                        name: file.name,
+                        preview: file.preview
+                    }));
+
+                    this.allAssets = [...existing, ...uploads];
+                },
+
+                handleNewFiles(event) {
+                    const input = event.target;
+                    const newFiles = Array.from(input.files);
+                    const combined = [...this.selectedFiles, ...newFiles];
+
+                    if (combined.length + this.existingAssets.length > 5) {
+                        alert(`Max 5 files allowed.`);
+                        input.value = '';
+                        return;
+                    }
+
+                    this.selectedFiles = combined;
+                    this.previewFiles = this.selectedFiles.map(file => ({
+                        file,
+                        name: file.name,
+                        preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
+                    }));
+
+                    const dataTransfer = new DataTransfer();
+                    this.selectedFiles.forEach(file => dataTransfer.items.add(file));
+                    input.files = dataTransfer.files;
+
+                    this.syncAllAssets();
+                },
+
+                removeNewFile(index) {
+                    const removed = this.previewFiles.splice(index, 1)[0];
+                    if (removed.preview) URL.revokeObjectURL(removed.preview);
+                    this.selectedFiles.splice(index, 1);
+
+                    const dataTransfer = new DataTransfer();
+                    this.selectedFiles.forEach(file => dataTransfer.items.add(file));
+                    document.getElementById('assets').files = dataTransfer.files;
+
+                    this.syncAllAssets();
+                },
+
+                removeExistingAsset(index) {
+                    this.existingAssets.splice(index, 1);
+                    this.syncAllAssets();
+                }
+            };
+        }
+    </script>
+    <script>
+        function ticketFormManager() {
+            return {
+                status: '',
+                priority: '',
+                assignee: '',
+                tshirtSize: '',
+                stakeholders: [],
+                addedStakeholders: new Set(),
+                existingAssets: [],
+                selectedFiles: [],
+                previewFiles: [],
+                allAssets: [],
+
+                initTicketData(data) {
+                    this.status = data.status;
+                    this.priority = data.priority;
+                    this.assignee = data.assignee;
+                    this.tshirtSize = data.tshirtSize;
+                    this.stakeholders = data.stakeholders;
+                    this.addedStakeholders = new Set(data.stakeholderIds);
+                    this.initExistingAssets(data.assets);
+                },
+
+                initExistingAssets(array) {
+                    this.existingAssets = Array.isArray(array) ? array : [];
+                    this.syncAllAssets();
+                },
+
+                syncAllAssets() {
+                    const existing = this.existingAssets.map((path, i) => ({
+                        key: `existing-${i}`,
+                        type: 'existing',
+                        name: path.split('/').pop(),
+                        preview: /\.(jpg|jpeg|png|webp|gif)$/i.test(path) ? `/storage/${path}` : null
+                    }));
+
+                    const uploads = this.previewFiles.map((file, i) => ({
+                        key: `new-${i}`,
+                        type: 'new',
+                        name: file.name,
+                        preview: file.preview
+                    }));
+
+                    this.allAssets = [...existing, ...uploads];
+                },
+
+                handleNewFiles(event) {
+                    const input = event.target;
+                    const newFiles = Array.from(input.files);
+                    const combined = [...this.selectedFiles, ...newFiles];
+
+                    if (combined.length + this.existingAssets.length > 5) {
+                        alert(`Max 5 files allowed.`);
+                        input.value = '';
+                        return;
+                    }
+
+                    this.selectedFiles = combined;
+                    this.previewFiles = this.selectedFiles.map(file => ({
+                        file,
+                        name: file.name,
+                        preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
+                    }));
+
+                    const dataTransfer = new DataTransfer();
+                    this.selectedFiles.forEach(file => dataTransfer.items.add(file));
+                    input.files = dataTransfer.files;
+
+                    this.syncAllAssets();
+                },
+
+                removeNewFile(index) {
+                    const removed = this.previewFiles.splice(index, 1)[0];
+                    if (removed.preview) URL.revokeObjectURL(removed.preview);
+                    this.selectedFiles.splice(index, 1);
+
+                    const dataTransfer = new DataTransfer();
+                    this.selectedFiles.forEach(file => dataTransfer.items.add(file));
+                    document.getElementById('assets').files = dataTransfer.files;
+
+                    this.syncAllAssets();
+                },
+
+                removeExistingAsset(index) {
+                    this.existingAssets.splice(index, 1);
+                    this.syncAllAssets();
+                },
 
                 addStakeholder(event) {
                     const userId = event.target.value;
@@ -476,6 +378,19 @@ function assetManager() {
             };
         }
     </script>
-
+    <script>
+        window.ticketData = {
+            status: @json(old('status', $ticket->status)),
+            priority: @json(old('priority', $ticket->priority)),
+            assignee: @json(old('assignee', $ticket->assignee)),
+            tshirtSize: @json(old('tshirt_size', $ticket->tshirt_size)),
+            stakeholders: @json($preselectedStakeholders),
+            stakeholderIds: @json($stakeholderIds),
+            assets: @json(json_decode($ticket->assets ?? '[]'))
+        };
+    </script>
+    <script>
+        window.ticketStakeholders = @json(\App\Models\User::whereIn('id', json_decode($ticket->stakeholders ?? '[]'))->get(['id', 'name']));
+    </script>
 
 </x-app-layout>

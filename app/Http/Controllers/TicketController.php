@@ -48,10 +48,20 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
-        $preselectedStakeholders = \App\Models\User::whereIn('id', json_decode($ticket->stakeholders ?? '[]'))->get(['id', 'name'])->map(function ($user) {
-            return ['id' => $user->id, 'name' => $user->name];
-        })->values()->toArray();
-        return view('tickets.show', compact('ticket', 'preselectedStakeholders'));
+        // Safely decode stakeholder IDs
+        $stakeholderIds = json_decode($ticket->stakeholders ?? '[]');
+
+        // Fetch only the necessary fields for Alpine
+        $preselectedStakeholders = \App\Models\User::whereIn('id', $stakeholderIds)
+            ->get(['id', 'name'])
+            ->map(fn($user) => ['id' => $user->id, 'name' => $user->name])
+            ->values()
+            ->toArray();
+        return view('tickets.show', [
+            'ticket' => $ticket,
+            'preselectedStakeholders' => $preselectedStakeholders,
+            'stakeholderIds' => $stakeholderIds,
+        ]);
     }
 
     public function search(Request $request)
@@ -113,7 +123,6 @@ class TicketController extends Controller
 
         // Final asset list = kept + newly uploaded
         $mergedAssets = array_merge($existingAssets, $newAssets);
-
         // Update ticket fields
         $ticket->update([
             'title' => $validated['title'],
