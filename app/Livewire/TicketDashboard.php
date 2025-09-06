@@ -46,7 +46,7 @@ class TicketDashboard extends Component
     {
         $users = User::withCount([
             'assignedTickets',
-            'completedTickets' => fn($q) => $q->where('status', 'Closed')
+            'completedTickets' => fn($q) => $q->where('status', 'C')
         ])->get();
 
         return [

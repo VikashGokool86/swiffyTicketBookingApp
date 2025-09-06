@@ -16,11 +16,12 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    // Add this route for the create support ticket view
     Route::get('/support-tickets/create', [TicketController::class, 'create'])->name('support-tickets.create');
 
     Route::resource('tickets', TicketController::class);
 
     Route::get('tickets', [TicketController::class, 'search'])->name('tickets.search');
+
+    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
     
 });

@@ -11,7 +11,7 @@ class TicketsTableSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create('en_ZA');
+        $faker = Faker::create();
 
         // Simulated asset filenames (these should exist in your storage or public folder)
           $assets = [

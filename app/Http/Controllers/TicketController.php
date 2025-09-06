@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 
@@ -48,15 +49,16 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
-        // Safely decode stakeholder IDs
+        
         $stakeholderIds = json_decode($ticket->stakeholders ?? '[]');
 
-        // Fetch only the necessary fields for Alpine
-        $preselectedStakeholders = \App\Models\User::whereIn('id', $stakeholderIds)
+        // Fetch preselected stakeholders
+        $preselectedStakeholders = User::whereIn('id', $stakeholderIds)
             ->get(['id', 'name'])
             ->map(fn($user) => ['id' => $user->id, 'name' => $user->name])
             ->values()
             ->toArray();
+
         return view('tickets.show', [
             'ticket' => $ticket,
             'preselectedStakeholders' => $preselectedStakeholders,

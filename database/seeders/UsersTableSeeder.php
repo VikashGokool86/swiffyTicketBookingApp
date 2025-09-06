@@ -11,7 +11,7 @@ class UsersTableSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create('en_ZA');
+        $faker = Faker::create();
 
         for ($i = 0; $i < 500; $i++) {
             User::create([

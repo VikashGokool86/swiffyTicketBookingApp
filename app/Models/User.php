@@ -72,6 +72,6 @@ class User extends Authenticatable
 
     public function completedTickets()
     {
-        return $this->hasMany(Ticket::class, 'assignee')->where('status', 'Closed');
+        return $this->hasMany(Ticket::class, 'assignee')->where('status', 'C');
     }
 }
