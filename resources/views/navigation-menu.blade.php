@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <x-application-mark class="block h-9 w-auto" />
+                        <img src="{{ asset('images/logo.png') }}" alt="Swiffy Logo" class="h-4 sm:h-6 md:h-8 lg:h-10 w-50 mt-4" width="50" />
                     </a>
                 </div>
 
