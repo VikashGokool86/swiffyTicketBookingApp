@@ -56,16 +56,17 @@ php artisan db:seed
 
 ```
 ## 🚀 Features (Screenshots of project)
+#### login Page
+<img width="200" height="2000" alt="image" src="https://github.com/user-attachments/assets/e30517b8-64a8-4733-a348-e9538cfc4493" />
 
-<img width="50" height="50" alt="image" src="https://github.com/user-attachments/assets/e30517b8-64a8-4733-a348-e9538cfc4493" />
-
+#### Register Page
 
 
 
 👨‍💻 Author
-Vikash Gokool
-Msunduzi, South Africa
-📧 vikashgokool@yahoo.com
+Vikash Gokool<br>
+Msunduzi, South Africa<br>
+📧 vikashgokool@yahoo.com<br>
 🔗 <a href="https://github.com/VikashGokool86">GitHub Profile</a>
 
 
