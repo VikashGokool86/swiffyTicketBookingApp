@@ -56,7 +56,7 @@ php artisan key:generate
 php artisan migrate
 php artisan db:seed
 -- This will populate the DB with test tickers and users
-
+---
 👨‍💻 Author
 
 Vikash Gokool
