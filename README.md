@@ -90,8 +90,17 @@ php artisan db:seed
 #### Create Ticket Error Handling / Sucess Page
 <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/308d8410-625f-4224-b628-a49b9fb290b1" />
 
-
 #### Search Ticket Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/dee34248-57e3-4b3b-b420-10c8c1f99d64" /><br>
+#### Search Ticket - Filters Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/6e49e153-195a-4e62-8396-700c33b573ea" /><br>
+#### Search Ticket - (Filters - Stakeholder) Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/72c8e1c9-103a-4874-8868-db0653a1cc01" /><br>
+#### Search Ticket - (Filters - Assignee) Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/906e2085-278d-4758-8342-316364c02bf7" /><br>
+#### Search Ticket - (Filters - Ticket Number) Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/eeeea0b3-3f86-433e-9b6b-58f5cf4597eb" />
+
 
 👨‍💻 Author
 Vikash Gokool<br>
