@@ -49,9 +49,6 @@ composer install
 npm install && npm run build
 cp .env.example .env
 -- ** Add Database details and email details if you have a email server and want to recieve the email
-<img width="30" height="30" alt="image" src="https://github.com/user-attachments/assets/4d9611dc-f7f0-4d06-b35d-91382c76ae5c" />
-<img width="30" height="30" alt="image" src="https://github.com/user-attachments/assets/92663d46-b4d7-45eb-b250-d470219447a3" />
-
 php artisan key:generate
 php artisan migrate
 php artisan db:seed
@@ -60,6 +57,7 @@ php artisan db:seed
 ```
 ## 🚀 Features (Screenshots of project)
 
+<img width="50" height="50" alt="image" src="https://github.com/user-attachments/assets/e30517b8-64a8-4733-a348-e9538cfc4493" />
 
 
 
