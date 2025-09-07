@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <x-application-mark class="block h-9 w-auto" />
+                        <img src="{{ asset('images/logo.png') }}" alt="Swiffy Logo" class="h-4 sm:h-6 md:h-8 lg:h-10 w-50 mt-4" width="50" />
                     </a>
                 </div>
 
@@ -15,6 +15,12 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link href="{{ route('support-tickets.create') }}" :active="request()->routeIs('support-tickets.create')">
+                        {{ __('Create Support Ticket') }}
+                    </x-nav-link>
+                        <x-nav-link href="{{ route('tickets.search') }}" :active="request()->routeIs('tickets.search')">
+                            {{ __('Search Tickets') }}
+                        </x-nav-link>
                 </div>
             </div>
 
@@ -141,6 +147,12 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('support-tickets.create') }}" :active="request()->routeIs('support-tickets.create')">
+                {{ __('Create Support Ticket') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('tickets.search') }}" :active="request()->routeIs('tickets.search')">
+                {{ __('Search Tickets') }}
             </x-responsive-nav-link>
         </div>
 

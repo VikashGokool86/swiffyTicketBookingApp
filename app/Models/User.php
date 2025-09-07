@@ -64,4 +64,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function assignedTickets()
+    {
+        return $this->hasMany(Ticket::class, 'assignee');
+    }
+
+    public function completedTickets()
+    {
+        return $this->hasMany(Ticket::class, 'assignee')->where('status', 'C');
+    }
 }
