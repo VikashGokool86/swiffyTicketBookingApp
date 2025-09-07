@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\User;
 use App\Models\Ticket;
 use Livewire\Component;
+use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 
 
@@ -23,7 +24,7 @@ class TicketDashboard extends Component
         $this->highPriority = Ticket::where('priority', 'H')->whereNull('assignee')->limit(10)->get();
     }
 
-    public function getStatusData()
+    public function getStatusData(): array
     {
         $statuses = Ticket::select('status', DB::raw('count(*) as total'))
             ->groupBy('status')->pluck('total', 'status');
@@ -42,7 +43,7 @@ class TicketDashboard extends Component
 
     }
 
-    public function getAssigneeData()
+    public function getAssigneeData(): array
     {
         $users = User::withCount([
             'assignedTickets',
@@ -55,7 +56,7 @@ class TicketDashboard extends Component
         ];
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.ticket-dashboard');
     }

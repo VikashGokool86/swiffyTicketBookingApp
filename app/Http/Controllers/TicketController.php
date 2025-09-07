@@ -5,16 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Contracts\TicketServiceInterface;
 
 class TicketController extends Controller
 {
-    public function create()
+    public function create(): View 
     {
+        $stakeholders = User::all() ?? []; 
         $assetsArray = []; // Initialize an empty array for assets
-        return view('create-support-ticket', compact('assetsArray'));
+        return view('create-support-ticket', compact('assetsArray','stakeholders'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request): Redirector|RedirectResponse
     {
         $data = $request->validate([
             'status' => 'required|string|max:255',
@@ -27,75 +32,48 @@ class TicketController extends Controller
             'assets.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx'
         ]);
 
-        $data['stakeholders'] = json_encode($data['stakeholders'] ?? []);
-
-        $assets = [];
-        if ($request->hasFile('assets')) {
-            foreach ($request->file('assets') as $file) {
-                $assets[] = $file->store('tickets_assets', 'public');
-            }
-        }
-        $data['assets'] = json_encode($assets);
-
-        $ticket = Ticket::create($data);
-
-        if (!$ticket) {
+        $ticketService = resolve(TicketServiceInterface::class);
+        $ticketID = $ticketService->create($data, $request);
+        if (!$ticketID) {
             return redirect()->back()->with('error', 'Failed to create ticket. Please try again.');
         }
 
-        return redirect()->route('tickets.show', $ticket->id)
+        return redirect()->route('tickets.show', $ticketID)
             ->with('success', 'Ticket created!');
     }
 
-    public function show(Ticket $ticket)
+    public function show(Ticket $ticket): View
     {
+        // troubleshoot why stakeholders are not showing after a save
         
-        $stakeholderIds = json_decode($ticket->stakeholders ?? '[]');
-
-        // Fetch preselected stakeholders
-        $preselectedStakeholders = User::whereIn('id', $stakeholderIds)
-            ->get(['id', 'name'])
-            ->map(fn($user) => ['id' => $user->id, 'name' => $user->name])
-            ->values()
-            ->toArray();
+        $ticketService = resolve(TicketServiceInterface::class);
+        $stakeholderInfo = $ticketService->display($ticket);
 
         return view('tickets.show', [
             'ticket' => $ticket,
-            'preselectedStakeholders' => $preselectedStakeholders,
-            'stakeholderIds' => $stakeholderIds,
+            'preselectedStakeholders' => $stakeholderInfo['preselectedStakeholders'] ?? [],
+            'stakeholderIds' => $stakeholderInfo['stakeholderIds'] ?? [],
         ]);
     }
 
-    public function search(Request $request)
+    public function search(Request $request): View
     {
-        $query = Ticket::query();
-
-        if ($request->filled('ticket_number')) {
-            $query->where('id', $request->ticket_number);
-        }
-
-        if ($request->filled('assignee')) {
-            $query->where('assignee', $request->assignee);
-        }
-
-        if ($request->filled('stakeholder')) {
-            $query->whereJsonContains('stakeholders', $request->stakeholder);
-        }
-
-        $tickets = $query->latest()->paginate(10)->withQueryString();
-
+        $ticketService = resolve(TicketServiceInterface::class);
+        $tickets = $ticketService->ticketSearch($request);
         return view('tickets.search', compact('tickets'));
     }
 
-    public function destroy($id)
+    public function destroy($id): Redirector|RedirectResponse
     {
-        $ticket = Ticket::findOrFail($id);
-        $ticket->delete();
-
+        $ticketService = resolve(TicketServiceInterface::class);
+        $ticketResponse = $ticketService->delete($id);
+        if(!$ticketResponse){
+            return redirect()->back()->with('error', 'Failed to delete ticket. Please try again.');
+        }
         return redirect()->route('tickets.search')->with('success', 'Ticket deleted successfully.');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): Redirector|RedirectResponse
     {
         $validated = $request->validate([
             'status' => 'required|string|max:255',
@@ -106,37 +84,14 @@ class TicketController extends Controller
             'assignee' => 'nullable|integer|exists:users,id',
             'tshirt_size' => 'nullable|string',
             'assets.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx',
-            'existing_assets' => 'nullable|string' // comma-separated string from Alpine
+            'existing_assets' => 'nullable|string' 
         ]);
 
-        $ticket = Ticket::findOrFail($id);
-
-        // Parse existing assets from hidden input
-        $existingAssets = array_filter(explode(',', $request->input('existing_assets', '')));
-
-        // Handle new asset uploads
-        $newAssets = [];
-        if ($request->hasFile('assets')) {
-            foreach ($request->file('assets') as $file) {
-                $path = $file->store('tickets/assets', 'public');
-                $newAssets[] = $path;
-            }
+        $ticketService = resolve(TicketServiceInterface::class);
+        $ticketID = $ticketService->update($request, $validated, $id);
+        if(!$ticketID) {
+            return redirect()->back()->with('error', 'Failed to update ticket. Please try again.');
         }
-
-        // Final asset list = kept + newly uploaded
-        $mergedAssets = array_merge($existingAssets, $newAssets);
-        // Update ticket fields
-        $ticket->update([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'assets' => json_encode($mergedAssets),
-            'status' => $validated['status'],
-            'priority' => $validated['priority'],
-            'tshirt_size' => $validated['tshirt_size'] ?? null,
-            'assignee' => $validated['assignee'] ?? null,
-            'stakeholders' => json_encode($validated['stakeholders'] ?? []),
-        ]);
-
-        return redirect()->route('tickets.show', $ticket->id)->with('success', 'Ticket updated successfully.');
+        return redirect()->route('tickets.show', $ticketID)->with('success', 'Ticket updated successfully.');
     }
 }
