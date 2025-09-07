@@ -104,7 +104,13 @@ php artisan db:seed
 <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/906e2085-278d-4758-8342-316364c02bf7" /><br>
 #### Search Ticket - (Filters - Ticket Number) Page
 <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/eeeea0b3-3f86-433e-9b6b-58f5cf4597eb" />
+#### Email Templete - (Update Stakeholder Email)
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/f5609bb8-fcc6-4094-9cdc-bf0df51550ac" />
+#### Email Templete - (Create Ticket / Inform Assignee Email)
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/34a0238b-6f98-4ec9-9f1c-56b2a22a016d" />
 
+<br>
+<br>
 <br>
 👨‍💻 Author
 Vikash Gokool<br>
