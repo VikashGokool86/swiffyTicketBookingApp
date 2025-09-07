@@ -57,7 +57,22 @@ php artisan migrate
 php artisan db:seed
 -- This will populate the DB with test tickers and users
 
-### test
+```
+## 🚀 Features (Screenshots of project)
+
+
+
+
+
+👨‍💻 Author
+Vikash Gokool
+Msunduzi, South Africa
+📧 vikashgokool@yahoo.com
+🔗 GitHub Profile
+
+
+
+ 
 
 
 
