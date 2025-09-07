@@ -68,7 +68,7 @@ php artisan db:seed
 Vikash Gokool
 Msunduzi, South Africa
 📧 vikashgokool@yahoo.com
-🔗 GitHub Profile
+🔗 <a href="https://github.com/VikashGokool86">GitHub Profile</a>
 
 
 
