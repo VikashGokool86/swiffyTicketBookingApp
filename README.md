@@ -73,19 +73,19 @@ php artisan db:seed
 
 #### Ticket Dashboard
 <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/a1e78290-ee0c-4ccc-a09e-f6a248330f11" /><br>
-<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/dc5f84bb-7160-4f56-8752-93d29cc3b882" />
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/dc5f84bb-7160-4f56-8752-93d29cc3b882" /><br>
 
 #### Create Ticket Page
 <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/ea3fd3ce-e478-4747-8264-086f06fd87ac" /><br>
 
 #### Create Ticket Error Handling Page
-<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/897791eb-40ae-4218-9503-bde86774711f" />
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/897791eb-40ae-4218-9503-bde86774711f" /><br>
 #### Create Ticket Success Page
-<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/e298c9e5-0ae1-41ad-aaa2-9b1a974069e0" />
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/e298c9e5-0ae1-41ad-aaa2-9b1a974069e0" /><br>
 
 
 #### Update Ticket Page
-<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/d44e2b1e-84da-4dc3-8013-d86161c9c39b" />
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/d44e2b1e-84da-4dc3-8013-d86161c9c39b" /><br>
 
 #### Create Ticket Error Handling / Sucess Page
 <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/308d8410-625f-4224-b628-a49b9fb290b1" />
