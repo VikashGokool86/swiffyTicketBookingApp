@@ -101,7 +101,7 @@ php artisan db:seed
 #### Search Ticket - (Filters - Ticket Number) Page
 <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/eeeea0b3-3f86-433e-9b6b-58f5cf4597eb" />
 
-
+<br>
 👨‍💻 Author
 Vikash Gokool<br>
 Msunduzi, South Africa<br>
