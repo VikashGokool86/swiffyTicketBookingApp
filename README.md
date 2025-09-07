@@ -55,6 +55,10 @@ php artisan db:seed
 -- This will populate the DB with test tickers and users
 
 ```
+#### Important Env setup images
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/7883b7b2-94cf-4daf-9691-9a55f1d37c25" /><br>
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/1c2286a3-0fa0-41c7-8fb8-3ab3ebe4f508" /><br>
+
 ## 🚀 Features (Screenshots of project)
 #### login Page
 <img width="200" height="2000" alt="image" src="https://github.com/user-attachments/assets/e30517b8-64a8-4733-a348-e9538cfc4493" />
