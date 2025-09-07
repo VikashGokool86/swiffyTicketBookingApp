@@ -60,8 +60,38 @@ php artisan db:seed
 <img width="200" height="2000" alt="image" src="https://github.com/user-attachments/assets/e30517b8-64a8-4733-a348-e9538cfc4493" />
 
 #### Register Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/131f60ce-6592-4e36-a095-1263f22c229e" />
+
+#### Already Registered / Login Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/0fac2d91-86ad-4fa6-8d06-d08c960f643f" />
+
+#### Forgot Password Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/22755ed1-20b0-4cf0-9f3a-320f6bf509a0" />
+
+#### Profile Page (With all the security features as well as session clearing)
+<img width="200" height="300" alt="image" src="https://github.com/user-attachments/assets/267fde62-3d8e-4faf-b7e4-a3d192373794" />
+
+#### Ticket Dashboard
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/a1e78290-ee0c-4ccc-a09e-f6a248330f11" /><br>
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/dc5f84bb-7160-4f56-8752-93d29cc3b882" />
+
+#### Create Ticket Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/ea3fd3ce-e478-4747-8264-086f06fd87ac" /><br>
+
+#### Create Ticket Error Handling Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/897791eb-40ae-4218-9503-bde86774711f" />
+#### Create Ticket Success Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/e298c9e5-0ae1-41ad-aaa2-9b1a974069e0" />
 
 
+#### Update Ticket Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/d44e2b1e-84da-4dc3-8013-d86161c9c39b" />
+
+#### Create Ticket Error Handling / Sucess Page
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/308d8410-625f-4224-b628-a49b9fb290b1" />
+
+
+#### Search Ticket Page
 
 👨‍💻 Author
 Vikash Gokool<br>
