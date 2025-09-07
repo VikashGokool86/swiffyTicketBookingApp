@@ -2,12 +2,16 @@
 
 namespace App\Services;
 
+use App\Mail\TicketCreatedMail;
 use Exception;
 use App\Models\User;
 use App\Models\Ticket;
-use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Http\Request;
+use App\Mail\TicketDeletedMail;
+use App\Mail\TicketUpdatedMail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Contracts\Pagination\Paginator;
 
 class TicketService
 {
@@ -25,6 +29,28 @@ class TicketService
         $data['assets'] = json_encode($assets);
 
         $ticket = Ticket::create($data);
+
+        if($ticket->id){
+            Log::info('Ticket created successfully with ID: ' . $ticket->id);
+             // Send notification emails
+            if(!empty($ticket->assignee) && !empty($ticket->assignee->email)){
+                Log::info('Sending ticket creation email to assignee: ' . $ticket->assignee->email);
+                Mail::to($ticket->assignee->email)->send(new TicketCreatedMail($ticket));
+            }
+            
+            $stakeholders = json_decode($ticket->stakeholders, true);
+
+            if (!empty($stakeholders) && count($stakeholders) > 0) {
+                Log::info('Sending ticket creation emails to stakeholders.');
+                foreach ($stakeholders as $userId) {
+                    $user = User::find($userId);
+                    if ($user) {
+                        Log::info('Sending ticket creation email to stakeholders: ' . $user->email);    
+                        Mail::to($user->email)->send(new TicketCreatedMail($ticket));
+                    }
+                }
+            }
+        } 
         return (!$ticket) ? 0 : $ticket->id;
         } catch (Exception $e) {
             Log::error('Error creating ticket: ' . $e->getMessage());
@@ -134,6 +160,25 @@ class TicketService
                 'assignee' => $validated['assignee'] ?? null,
                 'stakeholders' => json_encode($validated['stakeholders'] ?? []),
             ]);
+
+            // Send notification emails
+            if(!empty($ticket->assignee) && !empty($ticket->assignee->email)){
+                Log::info('Sending ticket update email to assignee: ' . $ticket->assignee->email);
+                 Mail::to($ticket->assignee->email)->send(new TicketUpdatedMail($ticket));
+            }
+
+            $stakeholders = json_decode($ticket->stakeholders, true);
+
+            if (!empty($stakeholders) && count($stakeholders) > 0) {
+                Log::info('Sending ticket update emails to stakeholders.');
+                foreach ($stakeholders as $userId) {
+                    $user = User::find($userId);
+                    if ($user) {
+                        Log::info('Sending ticket update email to stakeholder: ' . $user->email);
+                        Mail::to($user->email)->send(new TicketUpdatedMail($ticket));
+                    }
+                }
+            }
             return (!$ticket) ? 0 : $ticket->id;
         } catch (Exception $e) {
             Log::error('Error updating ticket ID ' . $id . ': ' . $e->getMessage());

@@ -292,31 +292,4 @@
             };
         }
     </script>
-    <script>
-        function stakeholderManager() {
-            return {
-                stakeholders: [],
-                added: new Set(),
-
-                addStakeholder(event) {
-                    const userId = event.target.value;
-                    const userName = event.target.options[event.target.selectedIndex].text;
-
-                    if (!userId || this.added.has(userId)) return;
-
-                    this.added.add(userId);
-                    this.stakeholders.push({
-                        id: userId,
-                        name: userName
-                    });
-                    event.target.value = '';
-                },
-
-                removeStakeholder(index) {
-                    const removed = this.stakeholders.splice(index, 1)[0];
-                    this.added.delete(removed.id);
-                }
-            };
-        }
-    </script>
 </x-app-layout>
